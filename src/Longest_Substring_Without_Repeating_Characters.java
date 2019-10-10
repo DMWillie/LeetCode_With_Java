@@ -1,7 +1,9 @@
+package LeetCode;
+
 /*  Author: 北辰
     日期: 07/10/2019
-    题目要求:给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
-示例 1:
+    题目要求:给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+示例 1:
 输入: "abcabcbb"
 输出: 3
 解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
@@ -12,11 +14,13 @@
 示例 3:
 输入: "pwwkew"
 输出: 3
-解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
-     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
  */
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Longest_Substring_Without_Repeating_Characters {
@@ -48,11 +52,12 @@ public class Longest_Substring_Without_Repeating_Characters {
             }
         }
         return maxlen;
-}
+    }
 
-    //暴力法***,寻找所有可能的子串,再判断每个子串是否有重复的元素
-    //时间复杂度:O(n^3),空间复杂度O(min(m,n)),我们需要 O(k)O(k) 的空间来检查子字符串中是否有重复字符，
-    // 其中 k 表示 Set 的大小。而 Set 的大小取决于字符串 nn 的大小以及字符集/字母 m 的大小
+    /*暴力法***,寻找所有可能的子串,再判断每个子串是否有重复的元素
+    时间复杂度:O(n^3),空间复杂度O(min(m,n)),我们需要O(k)的空间来检查子字符串中是否有重复字符，
+    其中 k 表示 Set 的大小。而 Set 的大小取决于字符串n的大小以及字符集/字母 m 的大小
+     */
     public int lengthOfLongestSubstring_2(String s){
         int n = s.length();
         int ans = 0;
@@ -75,6 +80,37 @@ public class Longest_Substring_Without_Repeating_Characters {
         return true;
     }
 
+    /*优化的滑动窗口***,我们定义从字符到索引的映射,而不是使用集合来判断一个字符是否存在。当找到重复的字符时,我们可以立即跳过该窗口
+    也就是说,如果s[j]在[i,j)范围内有与j'重复的字符,我们不需要逐渐增加i。我们可以直接跳过[i,j']范围内的所有元素,并将i变为j'+1
+    时间复杂度:
+     */
+    public int lengthOfLongestSubstring_4(String s){
+        Map<Character,Integer> map = new HashMap<>();
+        int ans = 0;
+        int n = s.length();
+        for(int i=0,j=0;j<n;j++){
+            if(map.containsKey(s.charAt(j))){
+                i = Math.max(map.get(s.charAt(j)),i);           //跳过[i,j')
+            }
+            ans = Math.max(ans,j-i+1);
+            map.put(s.charAt(j),j+1);
+        }
+        return ans;
+    }
+
+    //使用ASCII数组替代HashMap的滑动窗口***
+    public int lengthOfLongestSubstring_5(String s){
+        int ans = 0,n = s.length();
+        int[] index = new int[128];             // current index of character
+        // try to extend the range [i, j]
+        for(int i=0,j=0;j<n;j++){
+            i = Math.max(index[s.charAt(j)],i);
+            ans = Math.max(ans,j-i+1);
+            index[s.charAt(j)] = j+1;
+        }
+        return ans;
+    }
+
     //主方法测试
     public static void main(String[] args){
         Longest_Substring_Without_Repeating_Characters solution =
@@ -83,11 +119,14 @@ public class Longest_Substring_Without_Repeating_Characters {
         String str1 = "abcabcbb";
         String str2 = "bbbbb";
         String str3 = "pwwkew";
+        String str4 = "abcada";
         System.out.println(str1+" 无重复字符的最长子串的长度为: "
-                +solution.lengthOfLongestSubstring_1(str1));
+                +solution.lengthOfLongestSubstring_5(str1));
         System.out.println(str2+" 无重复字符的最长子串的长度为: "
-                +solution.lengthOfLongestSubstring_1(str2));
+                +solution.lengthOfLongestSubstring_5(str2));
         System.out.println(str3+" 无重复字符的最长子串的长度为: "
-                +solution.lengthOfLongestSubstring_1(str3));
+                +solution.lengthOfLongestSubstring_5(str3));
+        System.out.println(str3+" 无重复字符的最长子串的长度为: "
+                +solution.lengthOfLongestSubstring_5(str4));
     }
 }
