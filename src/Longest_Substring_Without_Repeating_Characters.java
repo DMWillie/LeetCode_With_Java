@@ -1,5 +1,3 @@
-package LeetCode;
-
 /*  Author: 北辰
     日期: 07/10/2019
     题目要求:给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
@@ -98,7 +96,8 @@ public class Longest_Substring_Without_Repeating_Characters {
         return ans;
     }
 
-    //使用ASCII数组替代HashMap的滑动窗口***
+    //使用ASCII数组替代HashMap的滑动窗口***,时间复杂度O(n),索引j将会迭代n次
+    //空间复杂度:O(m),m为字符集的大小
     public int lengthOfLongestSubstring_5(String s){
         int ans = 0,n = s.length();
         int[] index = new int[128];             // current index of character
