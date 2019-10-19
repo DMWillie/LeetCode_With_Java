@@ -16,13 +16,13 @@ public class LongestPalindromicSubstring {
         String str1 = "babad";
         String str2 = "cbbd";
         String str3 = "abdca";
+        String str4 = "abacdfgdcaba";
 
         LongestPalindromicSubstring solution = new LongestPalindromicSubstring();
-        //System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_1(str1));
-        //System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_1(str2));
-        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_2(str1));
-        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_2(str2));
-        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_2(str3));
+        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_3(str1));
+        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_3(str2));
+        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_3(str3));
+        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_3(str4));
     }
 
     public String longestPalindrome_1(String s){
@@ -81,6 +81,39 @@ public class LongestPalindromicSubstring {
                 return false;
         }
         return true;
+    }
+
+    //最长公共子串法***,将字符串s与s倒置后的s'进行比较,寻找最长公共子串(但这种解法不正确)
+    public String longestPalindrome_3(String s){
+        /*初始化一个二维数组arr[n][n](n代表s的长度),arr[i][j]表示字符串s从0-i
+        与字符串s'从0-j的公共子串的子串,有递推关系arr[i][j]=①arr[i-1][j-1]+1,当s[i]=s'[j],且i!=0&j!=0
+        ②1,当s[i]=s'[j],且i=0或j=0
+        时间复杂度:O(n^2),两个for循环对s和s'所有位置元素进行遍历
+        空间复杂度:O(n^2),需要借助n*n的辅助数组
+         */
+        if(s.equals(""))                //字符串为空
+            return "";
+        String reverse = new StringBuffer(s).reverse().toString();  //字符串倒置
+        int n = s.length();
+        int[][] arr = new int[n][n];    //初始化
+        int maxLen = 0;         //到目前为止最大公共子串的长度
+        int maxEnd = 0;         //到目前为止找到的最大公共子串的结束位置
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(s.charAt(i)==reverse.charAt(j)){
+                    if(i==0||j==0){
+                        arr[i][j] = 1;
+                    }else{
+                        arr[i][j] = arr[i-1][j-1]+1;
+                    }
+                }
+                if(arr[i][j]>maxLen){
+                    maxLen = arr[i][j];
+                    maxEnd = i;         //记录结束位置i
+                }
+            }
+        }
+        return s.substring(maxEnd-maxLen+1,maxEnd+1);
     }
 }
 
