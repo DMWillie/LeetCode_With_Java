@@ -19,10 +19,10 @@ public class LongestPalindromicSubstring {
         String str4 = "abacdfgdcaba";
 
         LongestPalindromicSubstring solution = new LongestPalindromicSubstring();
-        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_3(str1));
-        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_3(str2));
-        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_3(str3));
-        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_3(str4));
+        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_5(str1));
+        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_5(str2));
+        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_5(str3));
+        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_5(str4));
     }
 
     public String longestPalindrome_1(String s){
@@ -84,6 +84,8 @@ public class LongestPalindromicSubstring {
     }
 
     //最长公共子串法***,将字符串s与s倒置后的s'进行比较,寻找最长公共子串(但这种解法不正确)
+    //当字符串中存在某个子串的反向副本时,这种方法就会失效,例如"abcdacba"和其逆置"abcadcba"的最长公共子串为"abc"
+    //但"abc"不是回文串
     public String longestPalindrome_3(String s){
         /*初始化一个二维数组arr[n][n](n代表s的长度),arr[i][j]表示字符串s从0-i
         与字符串s'从0-j的公共子串的子串,有递推关系arr[i][j]=①arr[i-1][j-1]+1,当s[i]=s'[j],且i!=0&j!=0
@@ -114,6 +116,79 @@ public class LongestPalindromicSubstring {
             }
         }
         return s.substring(maxEnd-maxLen+1,maxEnd+1);
+    }
+
+    //加上下标判断的最长公共子串法***,使用动态规划
+    public String longestPalindrome_4(String s){
+        /*时间复杂度:O(n^2)
+          空间复杂度:O(n^2)
+         */
+        if(s.equals(""))                //字符串为空
+            return "";
+        String reverse = new StringBuffer(s).reverse().toString();  //字符串倒置
+        int n = s.length();
+        int[][] arr = new int[n][n];    //初始化
+        int maxLen = 0;         //到目前为止最大公共子串的长度
+        int maxEnd = 0;         //到目前为止找到的最大公共子串的结束位置
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(s.charAt(i)==reverse.charAt(j)){
+                    if(i==0||j==0){
+                        arr[i][j] = 1;
+                    }else{
+                        arr[i][j] = arr[i-1][j-1]+1;
+                    }
+                }
+                if(arr[i][j]>maxLen){
+                    int beforeRevj = s.length()-1-j;                //beforeRevj表示reverse的末尾下标倒置前的下标
+                    int beforeRevEndi = beforeRevj + arr[i][j] - 1;     //beforeRevEndi表示倒置前的末尾下标i的位置
+                    if(beforeRevEndi==i){           //加上对应位置是否相等的判断
+                        maxLen = arr[i][j];
+                        maxEnd = i;         //记录结束位置i
+                    }
+                }
+            }
+        }
+        return s.substring(maxEnd-maxLen+1,maxEnd+1);
+    }
+
+    //加上下标判断的最长公共子串法***,优化空间复杂度
+    public String longestPalindrome_5(String s){
+        /**我们每次更新arr[i][j]的时候其实只用到上一行的信息,例如arr[1][2]只用到第0行的信息,arr[2][1]只用到第1行的信息
+         *完全用不到第0行的信息...所以我们只需要一个一维数组保存上一行的信息就行了。但有一个值得注意的地方是,j的下标不能从0开始
+         * 因为arr[j]=arr[j-1]+1,若按0,1,2..的顺序,则我们更新完arr[1]之后,上一行的arr[1]的信息就被改变了,从而在更新本行的arr[2]的时候
+         * 用到arr[1]会发生错误,所以j的下标得倒着来
+         * 时间复杂度:O(n^2),空间复杂度:O(n)
+         */
+        if(s.equals(""))
+            return "";
+        String reverse = new StringBuffer(s).reverse().toString();
+        int maxLen = 0;             //目前回文子串的最大长度
+        int maxEnd = 0;             //目前最长回文子串的末尾下标位置
+        int n = s.length();
+        int[] arr = new int[n];         //辅助数组
+        for(int i=0;i<n;i++){
+            for(int j=n-1;j>=0;j--){            /**变化**/
+                if(s.charAt(i)==reverse.charAt(j)){
+                    if(i==0||j==0){
+                        arr[j] = 1;
+                    }else{
+                        arr[j] = arr[j-1] + 1;
+                    }
+                }else{              /**变化,因为之前的arr[i][j]只用一行的信息,所以不用置0**/
+                    arr[j] = 0;
+                }
+                //加上下标判断更新maxLen和maxEnd
+                if(arr[j]>maxLen){
+                    int beforeRevj = n - 1 - j;
+                    if(beforeRevj + arr[j] - 1 == i){
+                        maxLen = arr[j];
+                        maxEnd = i;
+                    }
+                }
+            }
+        }
+        return s.substring(maxEnd - maxLen + 1,maxEnd+1);
     }
 }
 
