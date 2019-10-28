@@ -19,10 +19,12 @@ public class LongestPalindromicSubstring {
         String str4 = "abacdfgdcaba";
 
         LongestPalindromicSubstring solution = new LongestPalindromicSubstring();
-        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_5(str1));
-        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_5(str2));
-        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_5(str3));
-        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_5(str4));
+        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_6(str1));
+        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_6(str2));
+        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_6(str3));
+        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_6(str4));
+
+
     }
 
     public String longestPalindrome_1(String s){
@@ -189,6 +191,34 @@ public class LongestPalindromicSubstring {
             }
         }
         return s.substring(maxEnd - maxLen + 1,maxEnd+1);
+    }
+
+    //动态规划***,利用公式来表达回文子串
+    public String longestPalindrome_6(String s){
+        /**首先,我们定义P(i,j)=①true,如果s[i,j]是回文串②false,如果s[i,j]不是回文子串
+         *那么P(i,j)=[P(i+1,j-1)&& s[i]==s[j]),但是i+1必须<=j-1,即j-i+1>=3(也就是字串的长度大于等于3
+         *时才能用此公式),长度为1和2的子串得单独谈论.(1)长度为1,即P(i,i)=true(2)长度为2,P(i,j)=(s[i]==s[j])
+         *所以我们需要初始化长度为1的回文子串,然后初始化长度为2的回文子串....
+         * 时间复杂度:O(n^2),空间复杂度:O(n^2)
+         */
+        int maxLen = 0;             //记录当前回文子串的最大长度
+        String maxStr = "";         //记录当前长度最大的回文子串
+        int n = s.length();
+        boolean[][] p = new boolean[n][n];      //初始化辅助数组
+        for(int len=1;len<=n;len++){        //依次更新长度为len的子串
+            for(int start=0;start<n;start++){   //start表示子串的开始下标
+                int end = start+len-1; //end表示子串结束的位置
+                if(end>=n)      //若结束位置索引超出范围,则跳出内层循环
+                    break;
+                p[start][end] = (len==1||len==2||p[start+1][end-1])
+                        &&(s.charAt(start)==s.charAt(end));//len为1或2单独判断
+                 if((p[start][end])&&(end-start+1>maxLen)){        //更新最大回文子串
+                     maxLen = end-start+1;
+                     maxStr = s.substring(start,end+1);
+                 }
+            }
+        }
+        return maxStr;
     }
 }
 
