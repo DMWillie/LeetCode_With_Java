@@ -19,10 +19,10 @@ public class LongestPalindromicSubstring {
         String str4 = "abacdfgdcaba";
 
         LongestPalindromicSubstring solution = new LongestPalindromicSubstring();
-        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_6(str1));
-        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_6(str2));
-        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_6(str3));
-        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_6(str4));
+        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_7(str1));
+        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_7(str2));
+        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_7(str3));
+        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_7(str4));
 
 
     }
@@ -219,6 +219,26 @@ public class LongestPalindromicSubstring {
             }
         }
         return maxStr;
+    }
+
+    //动态规划***,优化空间复杂度
+    public String longestPalindrome_7(String s){
+        /**倒着遍历,求第i行我们只需要第i+1行的信息,并且j的话我们也只需要j-1的信息
+         *时间复杂度:O(n^2),空间复杂度:O(n)
+         */
+        String res = "";
+        int n = s.length();
+        boolean[] p = new boolean[n];
+        for(int i=n-1;i>=0;i--){
+            for(int j=n-1;j>=i;j--){
+                int len = j-i+1;
+                p[j] = (s.charAt(i)==s.charAt(j))&&(len<3||p[j-1]);
+                if(p[j]&&len>res.length()){
+                    res = s.substring(i,j+1);
+                }
+            }
+        }
+        return res;
     }
 }
 
