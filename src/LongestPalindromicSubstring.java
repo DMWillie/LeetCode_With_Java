@@ -19,10 +19,10 @@ public class LongestPalindromicSubstring {
         String str4 = "abacdfgdcaba";
 
         LongestPalindromicSubstring solution = new LongestPalindromicSubstring();
-        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_7(str1));
-        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_7(str2));
-        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_7(str3));
-        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_7(str4));
+        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_8(str1));
+        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_8(str2));
+        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_8(str3));
+        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_8(str4));
 
 
     }
@@ -239,6 +239,36 @@ public class LongestPalindromicSubstring {
             }
         }
         return res;
+    }
+
+    //扩展中心算法***
+    public String longestPalindrome_8(String s){
+        /**由于回文串一定是左右对称的,所以我们可以从中心往两边扩展判断对应的字符是否相等
+         * 由于存在奇数个字符串和偶数个字符串,所以总共有n + n-1 个中心
+         * 时间复杂度:O(n^2),空间复杂度:O(1)
+         */
+        int start = 0,end = 0;      //回文串开始和结束的位置
+        //外层循环寻找每个可能的中心
+        for(int i=0;i<s.length();i++){
+            int len1 = expandAroundCenter(s,i,i);       //奇数个字符串的中心
+            int len2 = expandAroundCenter(s,i,i+1); //偶数个字符串的中心
+            int len = Math.max(len1,len2);
+            if(len>end-start+1){    //更新目前的最大回文子串
+                start = i - (len-1)/2;
+                end = i + len/2;
+            }
+        }
+        return s.substring(start,end+1);
+    }
+
+    //扩展中心,返回回文子串的长度
+    public int expandAroundCenter(String s,int left,int right){
+        int L = left,R = right;
+        while(L>=0&&R<s.length()&&(s.charAt(L)==s.charAt(R))){
+            L--;
+            R++;
+        }
+        return R-L-1;       //R-L+1-2=R-L-1
     }
 }
 
