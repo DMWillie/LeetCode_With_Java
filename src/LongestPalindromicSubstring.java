@@ -19,10 +19,10 @@ public class LongestPalindromicSubstring {
         String str4 = "abacdfgdcaba";
 
         LongestPalindromicSubstring solution = new LongestPalindromicSubstring();
-        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_8(str1));
-        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_8(str2));
-        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_8(str3));
-        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_8(str4));
+        System.out.println(str1+"的最长回文子串为: "+solution.longestPalindrome_9(str1));
+        System.out.println(str2+"的最长回文子串为: "+solution.longestPalindrome_9(str2));
+        System.out.println(str3+"的最长回文子串为: "+solution.longestPalindrome_9(str3));
+        System.out.println(str4+"的最长回文子串为: "+solution.longestPalindrome_9(str4));
 
 
     }
@@ -269,6 +269,65 @@ public class LongestPalindromicSubstring {
             R++;
         }
         return R-L-1;       //R-L+1-2=R-L-1
+    }
+
+    //Manacher's Algorithm 马拉车算法***
+    public String longestPalindrome_9(String s){
+        /**核心思想是充分利用回文串的对称性,利用边界情况和辅助字符将时间复杂度降到线性
+         * 算法详解链接:
+         * https://leetcode-cn.com/problems/longest-palindromic-substring/solution/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-bao-gu/
+         */
+        String T = preProcess(s);       //得到长度为奇数的字符串
+        int n = T.length();
+        int[] P = new int[n];           //数组P表示当前以每个字符为中心的最大回文子串的长度,初始化长度为0
+        int C=0,R=0;                    //初始化字符串中心C和当前字符串中心的最大回文子串的半径
+        for(int i=1;i<n-1;i++){
+            int i_mirror = 2*C - i;     //以C为中心i的镜像字符的位置
+            if(R>i){
+                P[i] = Math.min(R-i,P[i_mirror]);       //防止P[i]的右边界已经超出了R
+            }else{
+                P[i] = 0;           //如果i==R,则令P[i]=0
+            }
+
+            //遇到其他的情况,则以i为中心利用中心扩展来求P[i]
+            while(T.charAt(i+1+P[i])==T.charAt(i-1-P[i])){
+                P[i]++;
+            }
+            //判断是否要更新R
+            if(i+P[i]>R){
+                C = i;
+                R = C+P[i];
+            }
+        }
+
+        //找出P的最大值
+        int maxLen = 0;
+        int currentCenterIndex = 0;
+        for(int i=1;i<n-1;i++){
+            if(P[i]>maxLen){
+                maxLen = P[i];
+                currentCenterIndex = i;
+            }
+        }
+        int startIndex = (currentCenterIndex-maxLen)/2;   //求最开始的原字符串的下标
+        return s.substring(startIndex,startIndex+maxLen);
+    }
+
+    public static String preProcess(String s){
+        /**将字符预处理
+         * 解决之前的中心扩展算法的奇数和偶数的判断方法:在每个字符间插入 "#"，并且为了使得扩展的过程中，到边界后自动结束，
+         * 在两端分别插入 "^" 和 "$"，两个不可能在字符串中出现的字符，这样中心扩展的时候，判断两端字符是否相等的时候，
+         * 如果到了边界就一定会不相等，从而出了循环。经过处理，字符串的长度永远都是奇数了
+         */
+        int n = s.length();
+        if(n==0)
+            return "^$";
+
+        String ret = "^#";
+        for(int i=0;i<n;i++)
+            ret += s.charAt(i)+"#";
+        ret += "$";
+        return ret;
     }
 }
 
